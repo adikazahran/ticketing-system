@@ -1,0 +1,32 @@
+# Lingkungan Virtual
+.venv/
+env/
+venv/
+myticketenv/            # Menambahkan lingkungan virtual Anda
+fastapi_api_env/        # Menambahkan lingkungan virtual FastAPI Anda (jika ada)
+
+# File Database SQLite
+*.sqlite3               # File database SQLite utama
+*.sqlite3-journal       # File jurnal SQLite
+*.sqlite3-wal           # Write-Ahead Log SQLite
+*.sqlite3-shm           # Shared Memory SQLite
+
+# File Python yang diabaikan
+*.pyc                   # File bytecode yang dikompilasi
+__pycache__/            # Folder cache Python
+.DS_Store               # File macOS (jika Anda menggunakan Mac)
+.Python                 # Folder Python yang dibuat di macOS
+
+# Direktori IDE/Editor
+.idea/                  # Direktori PyCharm
+.vscode/                # Direktori VS Code
+*.sublime-project
+*.sublime-workspace
+
+# Direktori Statis/Media yang dibuat di deploy
+/staticfiles/           # Folder staticfiles yang dikoleksi Django
+/media/                 # Folder media (jika Anda menggunakannya untuk upload)
+
+# File konfigurasi lokal (jangan commit credential)
+local_settings.py       # Jika Anda memiliki file settings lokal
+.env                    # File environment variable

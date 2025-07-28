@@ -1,3 +1,5 @@
+# ticketing_system/fastapi_api.py
+
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship, selectinload
@@ -6,10 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from pydantic import BaseModel
 import asyncio
 from datetime import datetime
-from typing import Optional
+from typing import Optional 
 
 # --- Konfigurasi Database ---
-DATABASE_URL = "sqlite+aiosqlite:///db.sqlite3"
+DATABASE_URL = "sqlite+aiosqlite:///db.sqlite3" 
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
@@ -82,8 +84,9 @@ class UserSchema(BaseModel):
     username: str
     email: Optional[str]
     is_staff: bool
-
-    model_config = {'from_attributes': True}
+    
+    class Config: # <--- PERBAIKAN: Ubah model_config menjadi class Config
+        orm_mode = True # <--- PERBAIKAN: Ubah from_attributes menjadi orm_mode
 
 class TicketSchema(BaseModel):
     id: int
@@ -96,7 +99,8 @@ class TicketSchema(BaseModel):
     created_by_user: UserSchema
     assigned_to_user: Optional[UserSchema]
 
-    model_config = {'from_attributes': True}
+    class Config: # <--- PERBAIKAN: Ubah model_config menjadi class Config
+        orm_mode = True # <--- PERBAIKAN: Ubah from_attributes menjadi orm_mode
 
 # --- Inisialisasi FastAPI ---
 app = FastAPI()
