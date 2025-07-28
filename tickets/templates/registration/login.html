@@ -1,0 +1,41 @@
+{% extends 'tickets/base_login.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+{# Styles from login.html are moved to base_login.html for consistency and reusability #}
+{# This block is now cleaner as it only contains the structural HTML for the login form #}
+
+{# row and col classes are still useful for Bootstrap's grid system if you want to leverage it #}
+<div class="row justify-content-center h-100 w-100 mx-0"> {# Added w-100 mx-0 to ensure row takes full width without external margin #}
+    <div class="col-md-6 col-lg-5 col-xl-4 d-flex align-items-center justify-content-center"> {# d-flex for vertical/horizontal centering within col #}
+        <div class="login-card">
+            <img src="https://static.wikia.nocookie.net/logopedia/images/0/03/Alfagift_logo_new.png/revision/latest/scale-to-width-down/300?cb=20220326125336" alt="Alfagift Logo" class="login-logo"> {# Placeholder URL logo #}
+            <h2 class="card-title text-center"><i class="fas fa-user-circle me-2"></i> Login ke Sistem Ticketing</h2>
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i> Nama pengguna atau kata sandi Anda salah. Harap coba lagi.
+            </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                <div class="d-grid gap-2 mt-4"> {# mt-4 for button spacing #}
+                    <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-sign-in-alt me-2"></i> Login</button>
+                </div>
+            </form>
+            <p class="login-footer-text text-center">
+                <i class="fas fa-info-circle me-1"></i> Belum punya akun? Silakan hubungi Administrator untuk mendapatkan akses.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

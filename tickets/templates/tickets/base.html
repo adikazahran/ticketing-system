@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistem Ticketing{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Variabel CSS */
+        :root {
+            --navbar-height: 56px;
+            --footer-height: 40px;
+            --sidebar-width: 260px;
+            --content-padding: 20px;
+            --primary-color: #EE3124; /* Warna utama, disesuaikan dari login */
+            --secondary-color: #6c757d;
+            --dark-bg: #212529; /* Background gelap untuk navbar/sidebar */
+            --light-bg: #f8f9fa;
+            --card-border-radius: 12px; /* Sudut lebih membulat untuk card */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif; /* Gunakan font kustom */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin-top: var(--navbar-height); /* Disesuaikan dengan tinggi navbar */
+            margin-bottom: var(--footer-height); /* Disesuaikan dengan tinggi footer */
+            overflow-x: hidden;
+            padding-top: 15px;
+            background-color: #f0f2f5; /* Warna latar belakang yang lebih halus */
+        }
+
+        .navbar.fixed-top {
+            z-index: 1030;
+            background-color: var(--dark-bg) !important; /* Pastikan navbar gelap */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Tambahkan bayangan */
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+        }
+        .navbar-brand i {
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: var(--footer-height);
+            background-color: var(--light-bg);
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1020;
+            flex-shrink: 0;
+            font-size: 0.85em;
+            color: var(--secondary-color);
+        }
+        .footer .container {
+            text-align: center;
+            width: 100%;
+            padding: 0 15px;
+        }
+
+        .main-content-wrapper {
+            display: flex;
+            flex-grow: 1;
+            min-height: calc(100vh - var(--navbar-height) - var(--footer-height));
+            padding-top: var(--content-padding);
+            padding-bottom: var(--content-padding);
+            box-sizing: border-box;
+            width: 100%;
+            overflow-y: auto;
+            position: relative;
+            z-index: 2; 
+        }
+
+        /* Sidebar Desktop (mulai dari breakpoint 'lg') */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-bg); /* Warna gelap untuk sidebar */
+            color: white;
+            padding: 15px;
+            position: fixed;
+            top: var(--navbar-height);
+            bottom: var(--footer-height);
+            left: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1020;
+            flex-shrink: 0;
+            transform: translateX(-100%); /* Sembunyikan secara default */
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15); /* Bayangan saat terbuka */
+        }
+        .sidebar.active {
+            transform: translateX(0%);
+        }
+        .sidebar::-webkit-scrollbar { /* Scrollbar kustom untuk WebKit browsers */
+            width: 8px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: #3a4149;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-radius: 10px;
+            border: 2px solid #3a4149;
+        }
+
+
+        /* Area Konten Utama */
+        .content-area {
+            flex-grow: 1;
+            padding: 0;
+            transition: margin-left 0.3s ease-in-out;
+            position: relative;
+            z-index: 1;
+            margin-left: 0;
+        }
+        .content-area.sidebar-pushed {
+             margin-left: var(--sidebar-width);
+        }
+
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 10px 15px;
+            transition: all 0.3s ease; /* Transisi halus */
+            display: flex;
+            align-items: center;
+            border-radius: 5px; /* Sedikit pembulatan */
+            margin-bottom: 5px; /* Spasi antar item menu */
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #fff;
+            background-color: var(--primary-color); /* Warna aktif/hover dari tema utama */
+            transform: translateX(5px); /* Sedikit efek geser */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Bayangan kecil */
+        }
+        .sidebar .nav-link i {
+            margin-right: 12px; /* Spasi ikon lebih besar */
+            font-size: 1.1em;
+            width: 20px; /* Lebar tetap untuk ikon */
+            text-align: center;
+        }
+        .sidebar h5, .sidebar h6 {
+            padding: 10px 15px; /* Padding untuk judul sidebar */
+            color: rgba(255,255,255,0.7); /* Warna teks lebih terang */
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* General content centering for specific pages */
+        .centered-content {
+            /* max-width: 1200px; */ /* KOMEN BARIS INI ATAU UBAH NILAINYA */
+            max-width: 1400px; /* Contoh: Tingkatkan max-width */
+            /* Atau gunakan 100% jika ingin full width tanpa batas kecuali padding */
+            /* max-width: 100%; */ 
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-top: var(--content-padding);
+            padding-bottom: var(--content-padding);
+        }
+
+        /* All Devices */
+        h1 {
+            font-weight: 700;
+            color: #343a40;
+            margin-top: 0 !important;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        h1 i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .card {
+            border-radius: var(--card-border-radius);
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Bayangan yang lebih lembut */
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #D62C1E; /* Sedikit lebih gelap */
+            border-color: #C0271A;
+            transform: translateY(-1px); /* Efek sedikit terangkat */
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        /* Alert Messages */
+        .alert {
+            border-radius: 8px;
+            font-size: 0.95em;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Media Queries untuk Responsivitas */
+        @media (max-width: 991.98px) {
+            .main-content-wrapper {
+                flex-direction: column;
+            }
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                height: 100vh;
+                left: 0;
+                z-index: 1020;
+            }
+            .content-area {
+                margin-left: 0 !important;
+            }
+            .centered-content {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            .footer {
+                padding: 10px 0;
+            }
+
+            /* Perbaiki Z-index untuk Offcanvas dan Backdrop-nya */
+            .offcanvas.offcanvas-start {
+                z-index: 1045;
+            }
+            .offcanvas-backdrop.show {
+                z-index: 1040;
+            }
+        }
+
+        /* Large Devices (Desktops, 992px and up) */
+        @media (min-width: 992px) {
+            .main-content-wrapper {
+                height: auto;
+                overflow-y: visible;
+                flex-direction: row;
+            }
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0%);
+            }
+            .content-area {
+                margin-left: 0;
+            }
+            .content-area.sidebar-pushed {
+                margin-left: var(--sidebar-width);
+            }
+
+            .centered-content {
+                /* Untuk desktop, Anda bisa menyesuaikan ini */
+                /* Jika ingin benar-benar full width (dengan padding), gunakan ini: */
+                max-width: 80%; /* UBAH KE 100% UNTUK FULL WIDTH */
+                /* Atau jika ingin lebih lebar dari 1200px tapi tidak full: */
+                /* max-width: 1600px; */ /* Contoh lain */
+                padding-left: 25px; /* Tambah padding kiri dan kanan sedikit */
+                padding-right: 25px; /* Tambah padding kiri dan kanan sedikit */
+            }
+        }
+
+        /* Styling untuk Offcanvas (sidebar mobile) */
+        .offcanvas.offcanvas-start {
+            width: var(--sidebar-width);
+            background-color: var(--dark-bg);
+            color: white;
+            z-index: 1045;
+        }
+        .offcanvas-header .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        .offcanvas-body {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            flex-grow: 1;
+        }
+        .offcanvas-body .nav-link {
+            color: #adb5bd;
+        }
+        .offcanvas-body .nav-link:hover, .offcanvas-body .nav-link.active {
+            color: #fff;
+            background-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            {% if user.is_authenticated %}
+            <button class="btn btn-outline-light me-3 d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <button class="btn btn-outline-light me-3 d-none d-lg-block" type="button" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            {% endif %}
+            <a class="navbar-brand" href="{% url 'dashboard' %}"><i class="fas fa-ticket-alt"></i> Sistem Ticketing</a>
+
+            <div class="ms-auto">
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i> Halo, {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            {% if user.is_staff %}
+                            <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="fas fa-cog"></i> Admin Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% if user.is_authenticated %}
+    <div class="sidebar d-none d-lg-block" id="desktopSidebar">
+        <h5 class="text-white mb-3">Option</h5>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'ticket_list' %}active{% endif %}" href="{% url 'ticket_list' %}">
+                    <i class="fas fa-list-alt"></i> Daftar Tiket
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'ticket_create' %}active{% endif %}" href="{% url 'ticket_create' %}">
+                    <i class="fas fa-plus-circle"></i> Buat Tiket Baru
+                </a>
+            </li>
+            {% if user.is_staff %}
+            <li class="nav-item mt-3">
+                <h6 class="text-white-50">Admin Tools</h6>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:index' %}">
+                    <i class="fas fa-user-shield"></i> Kelola Pengguna & Data
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="offcanvas offcanvas-start bg-dark" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title text-white" id="sidebarOffcanvasLabel">Sistem Ticketing</h5>
+            <button type="button" class="btn-close text-reset bg-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'ticket_list' %}active{% endif %}" href="{% url 'ticket_list' %}">
+                        <i class="fas fa-list-alt"></i> Daftar Tiket
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'ticket_create' %}active{% endif %}" href="{% url 'ticket_create' %}">
+                        <i class="fas fa-plus-circle"></i> Buat Tiket Baru
+                    </a>
+                </li>
+                {% if user.is_staff %}
+                <li class="nav-item mt-3">
+                    <h6 class="text-white-50">Admin Tools</h6>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:index' %}">
+                        <i class="fas fa-user-shield"></i> Kelola Pengguna & Data
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="main-content-wrapper">
+        <main class="content-area" id="contentArea">
+            <div class="container-fluid centered-content">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <span>&copy; 2025 Sistem Ticketing | Adika Zahran</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const desktopSidebar = document.getElementById('desktopSidebar');
+            const contentArea = document.getElementById('contentArea');
+            const offcanvasElement = document.getElementById('sidebarOffcanvas');
+
+            function adjustContentLayout() {
+                if (window.innerWidth >= 992) {
+                    if (desktopSidebar && desktopSidebar.classList.contains('active')) {
+                        contentArea.classList.add('sidebar-pushed');
+                    } else {
+                        contentArea.classList.remove('sidebar-pushed');
+                    }
+                } else {
+                    contentArea.classList.remove('sidebar-pushed');
+                }
+            }
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    if (window.innerWidth >= 992) {
+                        desktopSidebar.classList.toggle('active');
+                        adjustContentLayout();
+                    }
+                });
+            }
+
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth >= 992 && desktopSidebar) {
+                    if (!desktopSidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                        if (desktopSidebar.classList.contains('active')) {
+                            desktopSidebar.classList.remove('active');
+                            adjustContentLayout();
+                        }
+                    }
+                }
+            });
+
+            if (offcanvasElement) {
+                offcanvasElement.addEventListener('show.bs.offcanvas', function () {
+                    if (window.innerWidth < 992 && desktopSidebar) {
+                        desktopSidebar.classList.remove('active');
+                        adjustContentLayout();
+                    }
+                });
+                offcanvasElement.addEventListener('hide.bs.offcanvas', function () {
+                    // No specific action needed here for desktop sidebar
+                });
+            }
+
+            adjustContentLayout();
+
+            window.addEventListener('resize', function() {
+                adjustContentLayout();
+                if (window.innerWidth >= 992 && offcanvasElement.classList.contains('show')) {
+                    const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+                    if (bsOffcanvas) {
+                        bsOffcanvas.hide();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

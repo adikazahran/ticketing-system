@@ -1,0 +1,16 @@
+{% extends 'tickets/base.html' %}
+
+{% block title %}Konfirmasi Hapus Tiket{% endblock %}
+
+{% block content %}
+<h1 class="mb-4"><i class="fas fa-trash-alt"></i> Hapus Tiket</h1>
+<div class="alert alert-danger" role="alert">
+    <p>Anda yakin ingin menghapus tiket "<strong>{{ ticket.title }}</strong>"?</p>
+    <p>Tindakan ini tidak dapat dibatalkan.</p>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger me-2"><i class="fas fa-check-circle"></i> Ya, Hapus</button>
+    <a href="{% url 'ticket_detail' pk=ticket.pk %}" class="btn btn-secondary"><i class="fas fa-times-circle"></i> Batal</a>
+</form>
+{% endblock %}
