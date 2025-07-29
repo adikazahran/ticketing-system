@@ -1,5 +1,3 @@
-# ticketing_system/fastapi_api.py
-
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship, selectinload

@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.urls import reverse # Pastikan ini ada
 
 class Ticket(models.Model):
     STATUS_CHOICES = [
@@ -31,13 +32,14 @@ class Ticket(models.Model):
     def __str__(self):
         return self.title
 
-    # Gunakan get_FOO_display() untuk mendapatkan label dari choice field
-    # Contoh: ticket.get_status_display() akan mengembalikan 'Open' bukan 'open'
     def get_status_display(self):
         return dict(self.STATUS_CHOICES).get(self.status, self.status.replace('_', ' ').title())
 
     def get_priority_display(self):
         return dict(self.PRIORITY_CHOICES).get(self.priority, self.priority.replace('_', ' ').title())
+
+    def get_absolute_url(self): # Diperlukan untuk notifikasi email dan ERT (jika diaktifkan)
+        return reverse('ticket_detail', kwargs={'pk': self.pk})
 
     class Meta:
         ordering = ['-created_at']
@@ -61,8 +63,34 @@ class TicketActivity(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-timestamp'] # Urutkan dari terbaru
+        ordering = ['-timestamp']
         verbose_name_plural = "Ticket Activities"
 
     def __str__(self):
         return f"{self.actor.username if self.actor else 'System'} - {self.action} on {self.ticket.title} at {self.timestamp}"
+
+# --- Tambahkan Model Chat Baru di bagian bawah file ini ---
+class Conversation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversations')
+    admin_assigned = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_conversations')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_closed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Chat with {self.user.username}"
+
+    class Meta:
+        ordering = ['-updated_at']
+
+class Message(models.Model):
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.sender.username} in {self.conversation.user.username}'s chat"
+
+    class Meta:
+        ordering = ['timestamp']

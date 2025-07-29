@@ -1,4 +1,3 @@
-# tickets/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -12,9 +11,12 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.conf import settings
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger # <--- Tambahkan import ini
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Ticket, Comment, TicketActivity
+# import requests # <--- Jangan di-uncomment jika Anda tidak menggunakan fitur ERT API
+from datetime import datetime # Diperlukan untuk timestamp pesan chat
+
+from .models import Ticket, Comment, TicketActivity, Conversation, Message # <--- Tambahkan Conversation, Message
 from .forms import TicketForm, CommentForm
 
 class DashboardView(LoginRequiredMixin, View):
@@ -43,8 +45,8 @@ class DashboardView(LoginRequiredMixin, View):
         # Logika Aktivitas Terkini (dengan Pagination)
         if request.user.is_staff:
             # Staf melihat semua aktivitas
-            all_activities = TicketActivity.objects.order_by('-timestamp') # Hapus slicing [:10] atau [:5] jika ada
-
+            all_activities = TicketActivity.objects.order_by('-timestamp')
+            
             # Statistik untuk staf (tetap seperti sebelumnya, tidak terkait pagination aktivitas)
             my_assigned_tickets_open = Ticket.objects.filter(assigned_to=request.user, status__in=['open', 'in_progress', 'reopened']).count()
             my_assigned_tickets_resolved = Ticket.objects.filter(assigned_to=request.user, status__in=['resolved', 'closed']).count()
@@ -67,7 +69,7 @@ class DashboardView(LoginRequiredMixin, View):
                     'display_name': display_status,
                     'count': item['count']
                 })
-
+            
             context.update({
                 'my_assigned_tickets_open': my_assigned_tickets_open,
                 'my_assigned_tickets_resolved': my_assigned_tickets_resolved,
@@ -76,12 +78,12 @@ class DashboardView(LoginRequiredMixin, View):
             })
         else:
             # Pengguna biasa melihat aktivitas terkait tiket yang mereka buat
-            all_activities = TicketActivity.objects.filter(ticket__created_by=request.user).order_by('-timestamp') # Hapus slicing [:10] atau [:5] jika ada
-
+            all_activities = TicketActivity.objects.filter(ticket__created_by=request.user).order_by('-timestamp')
+            
             # Statistik untuk pengguna biasa (tetap seperti sebelumnya)
             my_created_tickets_open = Ticket.objects.filter(created_by=request.user, status__in=['open', 'in_progress', 'reopened']).count()
             my_created_tickets_closed = Ticket.objects.filter(created_by=request.user, status__in=['resolved', 'closed']).count()
-
+            
             context.update({
                 'my_created_tickets_open': my_created_tickets_open,
                 'my_created_tickets_closed': my_created_tickets_closed,
@@ -95,8 +97,8 @@ class DashboardView(LoginRequiredMixin, View):
             activities_page_obj = paginator.page(1)
         except EmptyPage:
             activities_page_obj = paginator.page(paginator.num_pages)
-
-        context['activities_page_obj'] = activities_page_obj # <--- Masukkan page object ke context
+        
+        context['activities_page_obj'] = activities_page_obj # Masukkan page object ke context
 
         return render(request, self.template_name, context)
 
@@ -128,12 +130,11 @@ class TicketListView(LoginRequiredMixin, ListView):
                 Q(assigned_to__username__icontains=query)
             ).distinct()
         if status_filter:
-            # Menggunakan filter sesuai nama yang kita definisikan: 'open_active' dan 'resolved_closed'
-            if status_filter == 'open_active':
+            if status_filter == 'open_active': 
                 queryset = queryset.filter(status__in=['open', 'in_progress', 'reopened'])
             elif status_filter == 'resolved_closed':
                 queryset = queryset.filter(status__in=['resolved', 'closed'])
-            else: # Untuk status tunggal seperti 'open', 'in_progress', 'resolved', 'closed'
+            else: 
                 queryset = queryset.filter(status=status_filter)
         if priority_filter:
             queryset = queryset.filter(priority=priority_filter)
@@ -147,7 +148,7 @@ class TicketListView(LoginRequiredMixin, ListView):
                     queryset = queryset.filter(assigned_to__pk=int(assigned_to_filter))
                 except ValueError:
                     pass
-
+        
         if created_by_filter == 'me':
             queryset = queryset.filter(created_by=self.request.user)
         elif created_by_filter and created_by_filter != 'all':
@@ -162,14 +163,14 @@ class TicketListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['status_choices'] = Ticket.STATUS_CHOICES
         context['priority_choices'] = Ticket.PRIORITY_CHOICES
-
+        
         if self.request.user.is_staff:
             context['assignable_users'] = User.objects.filter(is_active=True, is_staff=True).order_by('username')
             context['all_users'] = User.objects.filter(is_active=True).order_by('username')
         else:
             context['assignable_users'] = []
             context['all_users'] = []
-
+            
         context['current_query'] = self.request.GET.get('q', '')
         context['current_status'] = self.request.GET.get('status', '')
         context['current_priority'] = self.request.GET.get('priority', '')
@@ -181,6 +182,8 @@ class TicketDetailView(LoginRequiredMixin, DetailView):
     model = Ticket
     template_name = 'tickets/ticket_detail.html'
     context_object_name = 'ticket'
+    
+    # ERT_API_URL = "http://127.0.0.1:8001/predict_ert" # Baris ini dikomentari di kode Anda
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -191,6 +194,11 @@ class TicketDetailView(LoginRequiredMixin, DetailView):
         if not self.request.user.is_staff and self.object.created_by != self.request.user:
             messages.error(self.request, 'Anda tidak memiliki izin untuk melihat tiket ini.')
             return redirect('ticket_list')
+
+        # --- LOGIKA PANGGILAN API ERT (Tidak ada dalam kode yang Anda berikan) ---
+        # Jika Anda ingin ERT, Anda perlu menambahkan kembali import requests dan logika panggilan API
+        # seperti yang ada di balasan sebelumnya.
+        # --- AKHIR LOGIKA PANGGILAN API ERT ---
 
         return context
 
@@ -214,9 +222,9 @@ class TicketDetailView(LoginRequiredMixin, DetailView):
             messages.success(request, 'Komentar berhasil ditambahkan!')
             return redirect('ticket_detail', pk=self.object.pk)
         else:
-            messages.error(request, 'Gagal menambahkan komentar. Harap periksa input Anda.')
             context = self.get_context_data(object=self.object)
             context['comment_form'] = comment_form
+            messages.error(request, 'Gagal menambahkan komentar. Harap periksa input Anda.')
             return self.render_to_response(context)
 
 class TicketCreateView(LoginRequiredMixin, CreateView):
@@ -228,7 +236,7 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         response = super().form_valid(form)
-
+        
         TicketActivity.objects.create(
             ticket=self.object,
             actor=self.request.user,
@@ -238,23 +246,23 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
 
         # --- LOGIKA PENGIRIMAN EMAIL BARU ---
         admin_emails = [user.email for user in User.objects.filter(is_staff=True, is_active=True) if user.email]
-
+        
         if admin_emails:
             subject = f'[SISTEM TIKET] Tiket Baru Dibuat: {self.object.title}'
             ticket_url = self.request.build_absolute_uri(self.object.get_absolute_url())
-
+            
             message_body = (
                 f'Halo,\n\n'
                 f'Sebuah tiket baru telah dibuat oleh {self.request.user.username}:\n\n'
-                f'Judul: {self.object.title}\n'
-                f'Deskripsi: {self.object.description}\n'
-                f'Prioritas: {self.object.get_priority_display()}\n\n'
+                f'Judul : {self.object.title}\n'
+                f'Deskripsi : {self.object.description}\n'
+                f'Prioritas : {self.object.get_priority_display()}\n\n'
                 f'Untuk melihat detail tiket dan menanganinya, kunjungi:\n'
                 f'{ticket_url}\n\n'
-                f'Terima kasih,\nSistem Ticketing Otomatis'
+                f'Terima kasih,\nTim IT Support'
             )
-
-            from_email = settings.DEFAULT_FROM_EMAIL
+            
+            from_email = '"Ticketing"'
             recipient_list = admin_emails
 
             try:
@@ -265,7 +273,7 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
                     recipient_list,
                     fail_silently=False,
                 )
-                messages.info(self.request, 'Notifikasi email telah dikirim kepada IT Support.')
+                messages.info(self.request, 'Notifikasi telah terkirim kepada Tim IT.')
             except Exception as e:
                 messages.error(self.request, f'Gagal mengirim notifikasi email: {e}')
         # --- AKHIR LOGIKA PENGIRIMAN EMAIL BARU ---
@@ -303,13 +311,13 @@ class TicketUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             if len(original_ticket.description) != len(updated_ticket.description) or \
                original_ticket.description[:50] != updated_ticket.description[:50]:
                 changes.append(f"Deskripsi diubah.")
-
+        
         if original_ticket.status != updated_ticket.status:
             changes.append(f"Status diubah dari '{original_ticket.get_status_display()}' menjadi '{updated_ticket.get_status_display()}'")
-
+        
         if original_ticket.priority != updated_ticket.priority:
             changes.append(f"Prioritas diubah dari '{original_ticket.get_priority_display()}' menjadi '{updated_ticket.get_priority_display()}'")
-
+        
         original_assigned_to_name = original_ticket.assigned_to.username if original_ticket.assigned_to else 'None'
         updated_assigned_to_name = updated_ticket.assigned_to.username if updated_ticket.assigned_to else 'None'
         if original_assigned_to_name != updated_assigned_to_name:

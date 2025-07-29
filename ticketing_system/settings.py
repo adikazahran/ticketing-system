@@ -1,3 +1,4 @@
+# ticketing_system/settings.py
 """
 Django settings for ticketing_system project.
 
@@ -13,7 +14,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
-from django.urls import reverse_lazy # <--- TAMBAHKAN INI
+from django.urls import reverse_lazy 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels', 
     'tickets',
 ]
 
@@ -140,13 +142,21 @@ MESSAGE_TAGS = {
 
 # --- Konfigurasi Email untuk Notifikasi ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com' # Contoh untuk Gmail. Ganti dengan server SMTP Anda.
-EMAIL_PORT = 587 # Port standar untuk TLS
-EMAIL_USE_TLS = True # Gunakan TLS (Transport Layer Security)
-EMAIL_HOST_USER = 'your_email@gmail.com' # Ganti dengan alamat email pengirim Anda
-EMAIL_HOST_PASSWORD = 'your_email_password_or_app_password' # Ganti dengan password email Anda (Gunakan App Password untuk Gmail!)
-DEFAULT_FROM_EMAIL = 'your_email@gmail.com' # Alamat email pengirim default
-SERVER_EMAIL = DEFAULT_FROM_EMAIL # Email untuk pesan error Django
+EMAIL_HOST = 'smtp.gmail.com' 
+EMAIL_PORT = 587 
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'jerrypud26@gmail.com' 
+EMAIL_HOST_PASSWORD = 'rtit tyxg gcdi yihn' 
+DEFAULT_FROM_EMAIL = 'jerrypud26@gmail.com' 
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # --- Redirect Setelah Logout ---
-LOGOUT_REDIRECT_URL = reverse_lazy('login') # <--- TAMBAHKAN INI. Ini adalah kunci.
+LOGOUT_REDIRECT_URL = reverse_lazy('login') # 
+
+# --- Konfigurasi ASGI dan Channel Layer ---
+ASGI_APPLICATION = 'ticketing_system.asgi.application' 
+CHANNEL_LAYERS = {                                    
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer', 
+    },
+}

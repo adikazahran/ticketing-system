@@ -29,4 +29,4 @@ __pycache__/            # Folder cache Python
 
 # File konfigurasi lokal (jangan commit credential)
 local_settings.py       # Jika Anda memiliki file settings lokal
-.env                    # File environment variable
+.env                    # File environment variable 
