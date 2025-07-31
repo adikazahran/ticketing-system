@@ -6,60 +6,60 @@
 <h1 class="mb-4"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
 
 {% if user.is_staff %}
-<p class="lead">Selamat datang, Tim IT! Berikut adalah ringkasan tiket.</p>
+<p class="lead text-muted">Selamat datang, Tim IT! Berikut adalah ringkasan tiket dan statistik sistem.</p>
 {% else %}
-<p class="lead">Selamat datang, Tim GLI! Berikut adalah ringkasan tiket yang Anda buat.</p>
+<p class="lead text-muted">Selamat datang, Tim GLI! Berikut adalah ringkasan tiket yang Anda buat.</p>
 {% endif %}
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-4">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5"> {# Increased margin-bottom #}
     <div class="col">
-        <div class="card text-white bg-primary mb-3">
+        <div class="card text-white bg-primary h-100"> {# Added h-100 for equal height #}
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title"><i class="fas fa-ticket-alt"></i> Total Tiket</h5>
-                        <p class="card-text fs-2">{{ total_tickets }}</p>
+                        <h5 class="card-title mb-1"><i class="fas fa-ticket-alt"></i> Total Tiket</h5>
+                        <p class="card-text fs-2 fw-bold">{{ total_tickets }}</p> {# Bold numbers #}
                     </div>
-                    <i class="fas fa-layer-group fa-3x"></i>
+                    <i class="fas fa-layer-group fa-3x opacity-50"></i> {# Subtle icon #}
                 </div>
             </div>
         </div>
     </div>
     <div class="col">
-        <div class="card text-white bg-info mb-3">
+        <div class="card text-white bg-info h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title"><i class="fas fa-folder-open"></i> Tiket Terbuka</h5>
-                        <p class="card-text fs-2">{{ open_tickets }}</p>
+                        <h5 class="card-title mb-1"><i class="fas fa-folder-open"></i> Tiket Terbuka</h5>
+                        <p class="card-text fs-2 fw-bold">{{ open_tickets }}</p>
                     </div>
-                    <i class="fas fa-exclamation-circle fa-3x"></i>
+                    <i class="fas fa-exclamation-circle fa-3x opacity-50"></i>
                 </div>
             </div>
         </div>
     </div>
     <div class="col">
-        <div class="card text-white bg-warning mb-3">
+        <div class="card text-white bg-warning h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title"><i class="fas fa-hourglass-half"></i> Tiket Dalam Proses</h5>
-                        <p class="card-text fs-2">{{ in_progress_tickets }}</p>
+                        <h5 class="card-title mb-1"><i class="fas fa-hourglass-half"></i> Tiket Dalam Proses</h5>
+                        <p class="card-text fs-2 fw-bold">{{ in_progress_tickets }}</p>
                     </div>
-                    <i class="fas fa-cogs fa-3x"></i>
+                    <i class="fas fa-cogs fa-3x opacity-50"></i>
                 </div>
             </div>
         </div>
     </div>
     <div class="col">
-        <div class="card text-white bg-success mb-3">
+        <div class="card text-white bg-success h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title"><i class="fas fa-check-circle"></i> Tiket Selesai</h5>
-                        <p class="card-text fs-2">{{ resolved_tickets }}</p>
+                        <h5 class="card-title mb-1"><i class="fas fa-check-circle"></i> Tiket Selesai</h5>
+                        <p class="card-text fs-2 fw-bold">{{ resolved_tickets }}</p>
                     </div>
-                    <i class="fas fa-clipboard-check fa-3x"></i>
+                    <i class="fas fa-clipboard-check fa-3x opacity-50"></i>
                 </div>
             </div>
         </div>
@@ -67,134 +67,172 @@
 </div>
 
 {% if user.is_staff %}
-<div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+<div class="row row-cols-1 row-cols-md-2 g-4 mb-5"> {# Increased margin-bottom #}
     <div class="col">
         <div class="card h-100 shadow-sm">
-            <div class="card-header bg-light">
-                <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Tiket Ditugaskan Kepada Saya</h5>
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-clipboard-list text-primary"></i> Tiket Ditugaskan Kepada Saya</h5>
             </div>
             <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Tiket Terbuka / Dalam Proses / Dibuka Kembali
-                        <span class="badge bg-primary rounded-pill">{{ my_assigned_tickets_open }}</span>
+                <ul class="list-group list-group-flush border-bottom mb-3"> {# Add border-bottom and margin #}
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                        Tiket Aktif (Terbuka/Dalam Proses/Dibuka Kembali)
+                        <span class="badge bg-primary rounded-pill fs-6">{{ my_assigned_tickets_open }}</span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Tiket Terselesaikan / Ditutup
-                        <span class="badge bg-success rounded-pill">{{ my_assigned_tickets_resolved }}</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                        Tiket Diselesaikan / Ditutup
+                        <span class="badge bg-success rounded-pill fs-6">{{ my_assigned_tickets_resolved }}</span>
                     </li>
                 </ul>
-                <a href="{% url 'ticket_list' %}?assigned_to=me" class="btn btn-sm btn-outline-primary mt-3"><i class="fas fa-arrow-right"></i> Lihat Tiket Saya</a>
+                <a href="{% url 'ticket_list' %}?assigned_to=me" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> Lihat Tiket Saya</a> {# Changed icon #}
             </div>
         </div>
     </div>
     <div class="col">
         <div class="card h-100 shadow-sm">
-            <div class="card-header bg-light">
-                <h5 class="mb-0"><i class="fas fa-sort-amount-up"></i> Statistik Tiket Berdasarkan Prioritas</h5>
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-sort-amount-up text-info"></i> Statistik Tiket Berdasarkan Prioritas</h5>
             </div>
             <div class="card-body">
+                {% if tickets_by_priority %}
                 <ul class="list-group list-group-flush">
                     {% for item in tickets_by_priority %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-2">
                         {{ item.display_name }}
-                        <span class="badge bg-secondary rounded-pill">{{ item.count }}</span>
+                        <span class="badge bg-secondary rounded-pill fs-6">{{ item.count }}</span>
                     </li>
-                    {% empty %}
-                    <li class="list-group-item">Tidak ada data prioritas.</li>
                     {% endfor %}
                 </ul>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-box-open fa-2x mb-3"></i>
+                    <p class="mb-0">Tidak ada data prioritas untuk ditampilkan.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+<div class="row row-cols-1 row-cols-md-2 g-4 mb-5"> {# Increased margin-bottom #}
     <div class="col">
         <div class="card h-100 shadow-sm">
-            <div class="card-header bg-light">
-                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Statistik Tiket Berdasarkan Status</h5>
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-info-circle text-warning"></i> Statistik Tiket Berdasarkan Status</h5>
             </div>
             <div class="card-body">
+                {% if tickets_by_status %}
                 <ul class="list-group list-group-flush">
                     {% for item in tickets_by_status %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-2">
                         {{ item.display_name }}
-                        <span class="badge bg-secondary rounded-pill">{{ item.count }}</span>
+                        <span class="badge bg-secondary rounded-pill fs-6">{{ item.count }}</span>
                     </li>
-                    {% empty %}
-                    <li class="list-group-item">Tidak ada data status.</li>
                     {% endfor %}
                 </ul>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-box-open fa-2x mb-3"></i>
+                    <p class="mb-0">Tidak ada data status untuk ditampilkan.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
-{# Anda bisa menambahkan kolom lain di sini jika ada statistik lain yang ingin ditampilkan #}
+    <div class="col">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-building text-success"></i> Statistik Tiket Berdasarkan Departemen</h5>
+            </div>
+            <div class="card-body">
+                {% if tickets_by_department %}
+                <ul class="list-group list-group-flush">
+                    {% for item in tickets_by_department %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                        {{ item.display_name }} {# Menggunakan display_name yang sudah diolah di views.py #}
+                        <span class="badge bg-secondary rounded-pill fs-6">{{ item.count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-box-open fa-2x mb-3"></i>
+                    <p class="mb-0">Tidak ada data departemen untuk ditampilkan.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 
-{% else %}
-<div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+{% else %} {# User is not staff #}
+<div class="row row-cols-1 row-cols-md-2 g-4 mb-5"> {# Increased margin-bottom #}
     <div class="col">
         <div class="card h-100 shadow-sm">
-            <div class="card-header bg-light">
-                <h5 class="mb-0"><i class="fas fa-folder-open"></i> Tiket Saya (Terbuka/Dalam Proses)</h5>
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-folder-open text-primary"></i> Tiket Saya (Aktif)</h5>
             </div>
-            <div class="card-body">
-                <p class="card-text fs-2 text-primary">{{ my_created_tickets_open }}</p>
-{# Perbaiki link status filter agar sesuai dengan views.py: 'open_active' #}
-                <a href="{% url 'ticket_list' %}?created_by=me&status=open_active" class="btn btn-sm btn-outline-primary mt-3"><i class="fas fa-arrow-right"></i> Lihat Tiket Saya</a>
+            <div class="card-body text-center"> {# Center align content #}
+                <p class="card-text fs-1 fw-bold text-primary mb-3">{{ my_created_tickets_open }}</p> {# Larger number, bold #}
+                <p class="text-muted mb-4">Tiket yang Anda buat dan masih dalam penanganan.</p>
+                <a href="{% url 'ticket_list' %}?created_by=me&status=open_active" class="btn btn-primary btn-lg"><i class="fas fa-arrow-alt-circle-right"></i> Lihat Tiket Aktif</a> {# Larger button #}
             </div>
         </div>
     </div>
     <div class="col">
         <div class="card h-100 shadow-sm">
-            <div class="card-header bg-light">
-                <h5 class="mb-0"><i class="fas fa-check-double"></i> Tiket Saya (Selesai/Ditutup)</h5>
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-check-double text-success"></i> Tiket Saya (Selesai/Ditutup)</h5>
             </div>
-            <div class="card-body">
-                <p class="card-text fs-2 text-success">{{ my_created_tickets_closed }}</p>
-{# Perbaiki link status filter agar sesuai dengan views.py: 'resolved_closed' #}
-                <a href="{% url 'ticket_list' %}?created_by=me&status=resolved_closed" class="btn btn-sm btn-outline-success mt-3"><i class="fas fa-arrow-right"></i> Lihat Tiket Selesai</a>
+            <div class="card-body text-center"> {# Center align content #}
+                <p class="card-text fs-1 fw-bold text-success mb-3">{{ my_created_tickets_closed }}</p> {# Larger number, bold #}
+                <p class="text-muted mb-4">Tiket yang telah diselesaikan atau ditutup.</p>
+                <a href="{% url 'ticket_list' %}?created_by=me&status=resolved_closed" class="btn btn-success btn-lg"><i class="fas fa-check-double"></i> Lihat Tiket Selesai</a> {# Larger button #}
             </div>
         </div>
     </div>
 </div>
 {% endif %}
 
-<div class="mt-5">
-    <h2 class="mb-3"><i class="fas fa-stream"></i> Aktivitas Terkini</h2>
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>Tiket</th>
-                    {% if user.is_staff %}<th>Aktor</th>{% endif %} {# Hanya tampilkan Aktor jika staff #}
-                    <th>Aksi</th>
-                    <th>Waktu</th>
-                </tr>
-            </thead>
-            <tbody>
-                {# Loop melalui object_list dari page object #}
-                {% for activity in activities_page_obj.object_list %}
-                <tr>
-                    <td><a href="{% url 'ticket_detail' pk=activity.ticket.pk %}">{{ activity.ticket.title }}</a></td>
-                    {% if user.is_staff %}<td>{{ activity.actor.username|default:"Sistem" }}</td>{% endif %} {# Tampilkan Aktor jika staff #}
-                    <td>{{ activity.action }}</td>
-                    <td>{{ activity.timestamp|date:"d M Y H:i" }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    {# colspan disesuaikan dengan jumlah kolom yang terlihat #}
-                    <td colspan="{% if user.is_staff %}4{% else %}3{% endif %}" class="text-center">Belum ada aktivitas tiket.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="mt-5 mb-5"> {# Added margin-bottom #}
+    <h2 class="mb-4"><i class="fas fa-stream text-secondary"></i> Aktivitas Terkini</h2> {# Icon color and spacing #}
+    <div class="card shadow-sm"> {# Wrap table in a card #}
+        <div class="card-body p-0"> {# Remove padding from card-body as table has its own #}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0"> {# Remove bottom margin #}
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Tiket</th>
+                            {% if user.is_staff %}<th style="width: 20%;">Aktor</th>{% endif %} {# Added width for better alignment #}
+                            <th style="width: 35%;">Aksi</th> {# Added width #}
+                            <th style="width: 20%;">Waktu</th> {# Added width #}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for activity in activities_page_obj.object_list %}
+                        <tr>
+                            <td><a href="{% url 'ticket_detail' pk=activity.ticket.pk %}" class="text-decoration-none text-primary fw-medium">{{ activity.ticket.title }}</a></td>
+                            {% if user.is_staff %}<td class="text-muted">{{ activity.actor.username|default:"Sistem" }}</td>{% endif %}
+                            <td>{{ activity.action }}</td>
+                            <td class="text-muted">{{ activity.timestamp|date:"d M Y H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="{% if user.is_staff %}4{% else %}3{% endif %}" class="text-center text-muted py-4">
+                                <i class="fas fa-bell-slash fa-2x mb-3"></i>
+                                <p class="mb-0">Belum ada aktivitas tiket terkini.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     {# Pagination Controls #}
     {% if activities_page_obj.has_other_pages %}
-    <nav aria-label="Aktivitas Pagination">
+    <nav aria-label="Aktivitas Pagination" class="mt-4"> {# Added margin-top #}
         <ul class="pagination justify-content-center">
             {% if activities_page_obj.has_previous %}
             <li class="page-item">
@@ -210,7 +248,7 @@
 
             {% for i in activities_page_obj.paginator.page_range %}
                 {% if activities_page_obj.number == i %}
-                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                <li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li> {# Added aria-current #}
                 {% else %}
                 <li class="page-item"><a class="page-link" href="?activity_page={{ i }}">{{ i }}</a></li>
                 {% endif %}
@@ -221,7 +259,7 @@
                 <a class="page-link" href="?activity_page={{ activities_page_obj.next_page_number }}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
-            </li>
+            </li>       
             {% else %}
             <li class="page-item disabled">
                 <span class="page-link">&raquo;</span>

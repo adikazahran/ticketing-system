@@ -193,13 +193,7 @@ class TicketDetailView(LoginRequiredMixin, DetailView):
 
         if not self.request.user.is_staff and self.object.created_by != self.request.user:
             messages.error(self.request, 'Anda tidak memiliki izin untuk melihat tiket ini.')
-            return redirect('ticket_list')
-
-        # --- LOGIKA PANGGILAN API ERT (Tidak ada dalam kode yang Anda berikan) ---
-        # Jika Anda ingin ERT, Anda perlu menambahkan kembali import requests dan logika panggilan API
-        # seperti yang ada di balasan sebelumnya.
-        # --- AKHIR LOGIKA PANGGILAN API ERT ---
-
+            return redirect('ticket_list')     
         return context
 
     def post(self, request, *args, **kwargs):
@@ -252,15 +246,20 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
             ticket_url = self.request.build_absolute_uri(self.object.get_absolute_url())
             
             message_body = (
-                f'Halo,\n\n'
-                f'Sebuah tiket baru telah dibuat oleh {self.request.user.username}:\n\n'
-                f'Judul : {self.object.title}\n'
-                f'Deskripsi : {self.object.description}\n'
-                f'Prioritas : {self.object.get_priority_display()}\n\n'
-                f'Untuk melihat detail tiket dan menanganinya, kunjungi:\n'
-                f'{ticket_url}\n\n'
-                f'Terima kasih,\nTim IT Support'
+                f"Halo Tim IT Support,\n\n"
+                f"Sistem telah menerima sebuah tiket baru yang diajukan oleh {self.request.user.username}.\n"
+                f"Berikut adalah detail dari tiket tersebut:\n\n"
+                f"Judul Tiket  : {self.object.title}\n"
+                f"Deskripsi    : {self.object.description}\n"
+                f"Prioritas      : {self.object.get_priority_display()}\n\n"
+                f"Silakan segera lakukan pengecekan dan tindak lanjut sesuai dengan prioritas yang ditentukan.\n\n"
+                f"👉 Detail tiket: {ticket_url}\n\n"
+                f"Jika tiket ini bukan tanggung jawab Anda, silakan teruskan ke tim yang sesuai atau update statusnya di sistem.\n\n"
+                f"Terima kasih atas perhatian dan kerjasamanya.\n\n"
+                f"Salam,\n"
+                f"Sistem Manajemen Tiket - IT Support"
             )
+
             
             from_email = '"Ticketing"'
             recipient_list = admin_emails

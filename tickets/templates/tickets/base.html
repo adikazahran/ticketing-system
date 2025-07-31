@@ -4,52 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sistem Ticketing{% endblock %}</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Variabel CSS */
+        /* Variabel CSS untuk kemudahan kustomisasi */
         :root {
             --navbar-height: 56px;
             --footer-height: 40px;
             --sidebar-width: 260px;
-            --content-padding: 20px;
-            --primary-color: #117c4d; 
+            --content-padding: 25px; /* Sedikit lebih banyak padding */
+            --primary-color: #14945a; /* Hijau utama yang sedikit diredam */
+            --primary-hover-color: #107e4d; /* Warna hover untuk primary */
             --secondary-color: #6c757d;
-            --dark-bg: #212529;
+            --dark-bg: #2a2e34; /* Latar belakang gelap yang sedikit lebih lembut */
             --light-bg: #f8f9fa;
-            --card-border-radius: 12px; 
+            --card-border-radius: 12px;
+            --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.15); /* Bayangan lebih jelas saat hover */
         }
 
         body {
-            font-family: 'Poppins', sans-serif; 
+            font-family: 'Poppins', sans-serif;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            margin-top: var(--navbar-height); 
-            margin-bottom: var(--footer-height); 
-            overflow-x: hidden;
-            padding-top: 15px;
+            margin-top: 50px;        
+            margin-bottom: var(--footer-height);
+            overflow-x: hidden; /* Mencegah scrollbar horizontal */
+            padding-top: 0px; /* Bootstrap fixed-top navbar sudah menangani ini */
             background-color: #f0f2f5;
+            line-height: 1.6; /* Meningkatkan keterbacaan teks */
+            color: #333; /* Warna teks default */
         }
 
+        /* Navbar Styling */
         .navbar.fixed-top {
             z-index: 1030;
             background-color: var(--dark-bg) !important;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
         }
 
         .navbar-brand {
             font-weight: 800;
             display: flex;
             align-items: center;
+            letter-spacing: -0.5px; /* Jarak huruf lebih rapat untuk brand */
+            color: #fff !important; /* Pastikan warna brand putih */
         }
         .navbar-brand i {
             margin-right: 8px;
             color: var(--primary-color);
         }
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: color 0.3s ease;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #fff !important;
+        }
+        .navbar-nav .dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-nav .dropdown-item {
+            transition: all 0.2s ease;
+        }
+        .navbar-nav .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+        .navbar-nav .dropdown-item i {
+            margin-right: 10px;
+        }
 
+        /* Footer Styling */
         .footer {
             position: fixed;
             bottom: 0;
@@ -62,7 +93,7 @@
             justify-content: center;
             z-index: 1020;
             flex-shrink: 0;
-            font-size: 0.85em;
+            font-size: 0.88em; /* Ukuran teks sedikit lebih besar */
             color: var(--secondary-color);
         }
         .footer .container {
@@ -71,6 +102,7 @@
             padding: 0 15px;
         }
 
+        /* Main Content Wrapper (memastikan konten mengisi sisa ruang) */
         .main-content-wrapper {
             display: flex;
             flex-grow: 1;
@@ -79,15 +111,15 @@
             padding-bottom: var(--content-padding);
             box-sizing: border-box;
             width: 100%;
-            overflow-y: auto;
+            overflow-y: auto; /* Memungkinkan scroll jika konten terlalu panjang */
             position: relative;
-            z-index: 2; 
+            z-index: 2;
         }
 
-        /* Sidebar Desktop (mulai dari breakpoint 'lg') */
+        /* Sidebar Desktop Styling (mulai dari breakpoint 'lg') */
         .sidebar {
             width: var(--sidebar-width);
-            background-color: var(--dark-bg); /* Warna gelap untuk sidebar */
+            background-color: var(--dark-bg);
             color: white;
             padding: 15px;
             position: fixed;
@@ -102,9 +134,10 @@
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15); /* Bayangan saat terbuka */
         }
         .sidebar.active {
-            transform: translateX(0%);
+            transform: translateX(0%); /* Munculkan saat aktif */
         }
-        .sidebar::-webkit-scrollbar { /* Scrollbar kustom untuk WebKit browsers */
+        /* Scrollbar kustom untuk sidebar */
+        .sidebar::-webkit-scrollbar {
             width: 8px;
         }
         .sidebar::-webkit-scrollbar-track {
@@ -116,71 +149,67 @@
             border: 2px solid #3a4149;
         }
 
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            border-radius: 8px; /* Sudut lebih membulat */
+            margin-bottom: 7px; /* Jarak antar item menu */
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #fff;
+            background-color: var(--primary-color);
+            transform: translateY(-2px); /* Efek lift saat hover/aktif */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Bayangan lebih jelas */
+        }
+        .sidebar .nav-link i {
+            margin-right: 12px;
+            font-size: 1.1em;
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar h5, .sidebar h6 {
+            padding: 10px 15px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
 
         /* Area Konten Utama */
         .content-area {
             flex-grow: 1;
-            padding: 0;
+            padding: 0; 
             transition: margin-left 0.3s ease-in-out;
             position: relative;
             z-index: 1;
             margin-left: 0;
+            width: 100%; 
         }
         .content-area.sidebar-pushed {
              margin-left: var(--sidebar-width);
         }
 
-        .sidebar .nav-link {
-            color: #adb5bd;
-            padding: 10px 15px;
-            transition: all 0.3s ease; /* Transisi halus */
-            display: flex;
-            align-items: center;
-            border-radius: 5px; /* Sedikit pembulatan */
-            margin-bottom: 5px; /* Spasi antar item menu */
-        }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            color: #fff;
-            background-color: var(--primary-color); /* Warna aktif/hover dari tema utama */
-            transform: translateX(5px); /* Sedikit efek geser */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Bayangan kecil */
-        }
-        .sidebar .nav-link i {
-            margin-right: 12px; /* Spasi ikon lebih besar */
-            font-size: 1.1em;
-            width: 20px; /* Lebar tetap untuk ikon */
-            text-align: center;
-        }
-        .sidebar h5, .sidebar h6 {
-            padding: 10px 15px; /* Padding untuk judul sidebar */
-            color: rgba(255,255,255,0.7); /* Warna teks lebih terang */
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
         /* General content centering for specific pages */
         .centered-content {
-            /* max-width: 1200px; */ /* KOMEN BARIS INI ATAU UBAH NILAINYA */
-            max-width: 1400px; /* Contoh: Tingkatkan max-width */
-            /* Atau gunakan 100% jika ingin full width tanpa batas kecuali padding */
-            /* max-width: 100%; */ 
+            max-width: 1400px;
             margin-left: auto;
             margin-right: auto;
-            padding-left: 15px;
-            padding-right: 15px;
-            padding-top: var(--content-padding);
-            padding-bottom: var(--content-padding);
+            padding: var(--content-padding); 
         }
 
-        /* All Devices */
+        /* General Styling for Common Elements */
         h1 {
             font-weight: 700;
             color: #343a40;
             margin-top: 0 !important;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem; /* Lebih banyak ruang bawah heading */
             display: flex;
             align-items: center;
+            letter-spacing: -0.5px;
         }
         h1 i {
             margin-right: 10px;
@@ -190,7 +219,12 @@
         .card {
             border-radius: var(--card-border-radius);
             border: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Bayangan yang lebih lembut */
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease; /* Transisi untuk efek hover */
+        }
+        .card:hover {
+            transform: translateY(-5px); /* Angkat kartu saat hover */
+            box-shadow: var(--shadow-hover); /* Bayangan lebih gelap saat hover */
         }
 
         .btn-primary {
@@ -198,39 +232,58 @@
             border-color: var(--primary-color);
             transition: all 0.3s ease;
             font-weight: 500;
+            padding: 0.65rem 1.25rem; /* Ukuran tombol sedikit lebih besar */
+            border-radius: 8px; /* Sudut membulat */
         }
         .btn-primary:hover {
-            background-color: #D62C1E; /* Sedikit lebih gelap */
-            border-color: #C0271A;
-            transform: translateY(-1px); /* Efek sedikit terangkat */
+            background-color: var(--primary-hover-color);
+            border-color: var(--primary-hover-color);
+            transform: translateY(-2px); /* Efek lift saat hover */
         }
 
         .btn-secondary {
             background-color: var(--secondary-color);
             border-color: var(--secondary-color);
+            transition: all 0.3s ease;
+            font-weight: 500;
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
         }
         .btn-secondary:hover {
             background-color: #5a6268;
             border-color: #545b62;
+            transform: translateY(-2px);
         }
+
+        /* Override Bootstrap info/warning/success for cards to ensure theme consistency */
+        .card.bg-primary { background-color: var(--primary-color) !important; border-color: var(--primary-color) !important; }
+        .card.bg-info { background-color: #17a2b8 !important; border-color: #17a2b8 !important; }
+        .card.bg-warning { background-color: #ffc107 !important; border-color: #ffc107 !important; }
+        .card.bg-success { background-color: #28a745 !important; border-color: #28a745 !important; }
+
 
         /* Alert Messages */
         .alert {
             border-radius: 8px;
             font-size: 0.95em;
-            margin-top: 10px;
-            margin-bottom: 20px;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            padding: 1rem 1.25rem;
         }
 
         /* Media Queries untuk Responsivitas */
-        @media (max-width: 991.98px) {
+        @media (max-width: 991.98px) { /* Small devices (mobile, tablet) */
+            body {
+                margin-top: 70px;       
+            }
             .main-content-wrapper {
                 flex-direction: column;
+                padding-top: var(--content-padding); /* Penting untuk mobile agar konten tidak tertutup navbar */
             }
-            .sidebar {
+            .sidebar { /* Sidebar mobile sebagai offcanvas */
                 transform: translateX(-100%);
                 position: fixed;
-                top: 0;
+                top: 0; /* Mulai dari atas layar */
                 bottom: 0;
                 height: 100vh;
                 left: 0;
@@ -238,6 +291,7 @@
             }
             .content-area {
                 margin-left: 0 !important;
+                width: 100%; /* Pastikan konten memenuhi lebar */
             }
             .centered-content {
                 padding-left: 15px;
@@ -256,34 +310,30 @@
             }
         }
 
-        /* Large Devices (Desktops, 992px and up) */
-        @media (min-width: 992px) {
+        @media (min-width: 992px) { /* Large Devices (Desktops) */
             .main-content-wrapper {
-                height: auto;
-                overflow-y: visible;
+                height: auto; /* Biarkan tinggi menyesuaikan konten */
+                overflow-y: visible; /* Tidak ada scrollbar di wrapper utama */
                 flex-direction: row;
             }
             .sidebar {
-                transform: translateX(-100%);
+                transform: translateX(-100%); /* Sembunyikan default di desktop */
             }
             .sidebar.active {
-                transform: translateX(0%);
+                transform: translateX(0%); /* Munculkan saat tombol di klik */
             }
             .content-area {
                 margin-left: 0;
+                width: auto; /* Lebar otomatis, akan disorong oleh sidebar */
             }
             .content-area.sidebar-pushed {
                 margin-left: var(--sidebar-width);
             }
 
             .centered-content {
-                /* Untuk desktop, Anda bisa menyesuaikan ini */
-                /* Jika ingin benar-benar full width (dengan padding), gunakan ini: */
-                max-width: 80%; /* UBAH KE 100% UNTUK FULL WIDTH */
-                /* Atau jika ingin lebih lebar dari 1200px tapi tidak full: */
-                /* max-width: 1600px; */ /* Contoh lain */
-                padding-left: 25px; /* Tambah padding kiri dan kanan sedikit */
-                padding-right: 25px; /* Tambah padding kiri dan kanan sedikit */
+                max-width: 85%;
+                padding-left: 30px;
+                padding-right: 30px;
             }
         }
 
@@ -294,20 +344,38 @@
             color: white;
             z-index: 1045;
         }
+        .offcanvas-header {
+            border-bottom: 1px solid rgba(255,255,255,0.1); /* Garis pemisah di header offcanvas */
+        }
         .offcanvas-header .btn-close {
-            filter: invert(1) grayscale(100%) brightness(200%);
+            filter: invert(1) grayscale(100%) brightness(200%); /* Membuat ikon close putih */
+            opacity: 0.8;
         }
         .offcanvas-body {
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             flex-grow: 1;
+            padding: 15px; /* Padding di body offcanvas */
         }
         .offcanvas-body .nav-link {
             color: #adb5bd;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin-bottom: 7px;
         }
         .offcanvas-body .nav-link:hover, .offcanvas-body .nav-link.active {
             color: #fff;
             background-color: var(--primary-color);
+            transform: translateX(5px); /* Efek geser kecil */
+        }
+        .offcanvas-body h5, .offcanvas-body h6 {
+            padding: 10px 15px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -351,7 +419,7 @@
 
     {% if user.is_authenticated %}
     <div class="sidebar d-none d-lg-block" id="desktopSidebar">
-        <h5 class="text-white mb-3">Option</h5>
+        <h5 class="text-white mb-3">Menu Aplikasi</h5>
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
@@ -359,7 +427,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'ticket_list' %}active{% endif %}" href="{% url 'ticket_list' %}">
+                <a class="nav-link {% if 'ticket_list' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'ticket_list' %}">
                     <i class="fas fa-list-alt"></i> Daftar Tiket
                 </a>
             </li>
@@ -394,7 +462,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'ticket_list' %}active{% endif %}" href="{% url 'ticket_list' %}">
+                    <a class="nav-link {% if 'ticket_list' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'ticket_list' %}">
                         <i class="fas fa-list-alt"></i> Daftar Tiket
                     </a>
                 </li>
@@ -450,21 +518,23 @@
             const contentArea = document.getElementById('contentArea');
             const offcanvasElement = document.getElementById('sidebarOffcanvas');
 
+            // Fungsi untuk menyesuaikan layout konten berdasarkan sidebar desktop aktif
             function adjustContentLayout() {
-                if (window.innerWidth >= 992) {
+                if (window.innerWidth >= 992) { // Hanya berlaku di desktop
                     if (desktopSidebar && desktopSidebar.classList.contains('active')) {
                         contentArea.classList.add('sidebar-pushed');
                     } else {
                         contentArea.classList.remove('sidebar-pushed');
                     }
                 } else {
-                    contentArea.classList.remove('sidebar-pushed');
+                    contentArea.classList.remove('sidebar-pushed'); // Pastikan tidak ada margin di mobile
                 }
             }
 
+            // Event listener untuk tombol toggle sidebar desktop
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', function(event) {
-                    event.stopPropagation();
+                    event.stopPropagation(); // Mencegah event click menyebar ke document
                     if (window.innerWidth >= 992) {
                         desktopSidebar.classList.toggle('active');
                         adjustContentLayout();
@@ -472,9 +542,11 @@
                 });
             }
 
+            // Event listener untuk menutup sidebar desktop saat klik di luar area sidebar
             document.addEventListener('click', function(event) {
                 if (window.innerWidth >= 992 && desktopSidebar) {
-                    if (!desktopSidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                    // Jika klik di luar sidebar DAN di luar tombol toggle
+                    if (!desktopSidebar.contains(event.target) && sidebarToggle && !sidebarToggle.contains(event.target)) {
                         if (desktopSidebar.classList.contains('active')) {
                             desktopSidebar.classList.remove('active');
                             adjustContentLayout();
@@ -483,22 +555,25 @@
                 }
             });
 
+            // Event listener untuk Offcanvas (sidebar mobile)
             if (offcanvasElement) {
+                // Saat offcanvas muncul, pastikan sidebar desktop tidak aktif
                 offcanvasElement.addEventListener('show.bs.offcanvas', function () {
                     if (window.innerWidth < 992 && desktopSidebar) {
                         desktopSidebar.classList.remove('active');
                         adjustContentLayout();
                     }
                 });
-                offcanvasElement.addEventListener('hide.bs.offcanvas', function () {
-                    // No specific action needed here for desktop sidebar
-                });
+                // Saat offcanvas tersembunyi, tidak perlu tindakan khusus pada sidebar desktop
             }
 
+            // Panggil saat halaman pertama kali dimuat
             adjustContentLayout();
 
+            // Panggil saat ukuran jendela berubah
             window.addEventListener('resize', function() {
                 adjustContentLayout();
+                // Jika beralih ke desktop saat offcanvas terbuka, sembunyikan offcanvas
                 if (window.innerWidth >= 992 && offcanvasElement.classList.contains('show')) {
                     const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
                     if (bsOffcanvas) {
